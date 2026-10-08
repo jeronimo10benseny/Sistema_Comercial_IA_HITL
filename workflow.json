@@ -1,0 +1,732 @@
+{
+  "name": "Sistema_Comercial_IA_HITL",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "d1bfa451-7871-41bf-a840-b559ca154204",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appIH9rbxzM7sw7zO",
+          "mode": "list",
+          "cachedResultName": "Sistema_Comercial_IA",
+          "cachedResultUrl": "https://airtable.com/appIH9rbxzM7sw7zO"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblbJOI1RGV7EJgGq",
+          "mode": "list",
+          "cachedResultName": "Leads",
+          "cachedResultUrl": "https://airtable.com/appIH9rbxzM7sw7zO/tblbJOI1RGV7EJgGq"
+        },
+        "filterByFormula": "{Estado} = 'Nuevo'",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "ce01c0d1-d974-4458-9115-7d965205766c",
+      "name": "Obtener Lead Nuevo",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "kAVqKacbixamdhpE",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "base": {
+          "__rl": true,
+          "value": "appIH9rbxzM7sw7zO",
+          "mode": "list",
+          "cachedResultName": "Sistema_Comercial_IA",
+          "cachedResultUrl": "https://airtable.com/appIH9rbxzM7sw7zO"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblIbS765q8c1J02W",
+          "mode": "list",
+          "cachedResultName": "Servicios",
+          "cachedResultUrl": "https://airtable.com/appIH9rbxzM7sw7zO/tblIbS765q8c1J02W"
+        },
+        "id": "={{ $('Obtener Lead Nuevo').item.json.fields.Servicio_Interes[0] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        448,
+        0
+      ],
+      "id": "fd0d4a55-06f8-463a-9375-9fe2df769cc7",
+      "name": "Obtener Servicio Vinculado",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "kAVqKacbixamdhpE",
+          "name": "Airtable account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-3.5-flash-lite",
+          "mode": "list",
+          "cachedResultName": "models/gemini-3.5-flash-lite"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Sos un Director Comercial B2B experto en automatización.\n\nAnalizá la siguiente consulta de un cliente potencial y generá una evaluación comercial:\n\nDATOS DEL CLIENTE:\n- Nombre: {{ $('Obtener Lead Nuevo').item.json.fields.Nombre_Cliente }}\n- Consulta: {{ $('Obtener Lead Nuevo').item.json.fields.Consulta_Original }}\n\nDATOS DEL SERVICIO COTIZADO:\n- Servicio: {{ $('Obtener Servicio Vinculado').item.json.fields.Nombre_Servicio }}\n- Precio: USD {{ $('Obtener Servicio Vinculado').item.json.fields.Precio }}\n- Alcance: {{ $('Obtener Servicio Vinculado').item.json.fields.Alcance }}\n\nINSTRUCCIONES DE SALIDA:\nRespondé ÚNICAMENTE un objeto JSON válido (sin bloques de código markdown, sin ```json, solo el JSON puro) con estas dos claves:\n1. \"score\": Un número entero entre 0 y 100 que mida el interés real y solvencia del lead.\n2. \"propuesta\": Una propuesta comercial ejecutiva, cálida y directa dirigida a {{ $('Obtener Lead Nuevo').item.json.fields.Nombre_Cliente }}, explicando cómo el {{ $('Obtener Servicio Vinculado').item.json.fields.Nombre_Servicio }} resolverá su necesidad por USD {{ $('Obtener Servicio Vinculado').item.json.fields.Precio }}."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        672,
+        0
+      ],
+      "id": "64388968-944f-4e29-aa87-1ea9bd12cdd9",
+      "name": "Clasificar y Redactar Propuesta",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "agUJxr7ntUq8zWnP",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appIH9rbxzM7sw7zO",
+          "mode": "list",
+          "cachedResultName": "Sistema_Comercial_IA",
+          "cachedResultUrl": "https://airtable.com/appIH9rbxzM7sw7zO"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblbJOI1RGV7EJgGq",
+          "mode": "list",
+          "cachedResultName": "Leads",
+          "cachedResultUrl": "https://airtable.com/appIH9rbxzM7sw7zO/tblbJOI1RGV7EJgGq"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('Obtener Lead Nuevo').item.json.id }}",
+            "Score_Lead": "={{ JSON.parse($json.content.parts[0].text).score }}",
+            "Propuesta_generada": "={{ JSON.parse($json.content.parts[0].text).propuesta }}",
+            "Estado": "Esperando aprobación"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Nombre_Cliente",
+              "displayName": "Nombre_Cliente",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Consulta_Original",
+              "displayName": "Consulta_Original",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Servicio_Interes",
+              "displayName": "Servicio_Interes",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Score_Lead",
+              "displayName": "Score_Lead",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Propuesta_generada",
+              "displayName": "Propuesta_generada",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Estado",
+              "displayName": "Estado",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Nuevo",
+                  "value": "Nuevo"
+                },
+                {
+                  "name": "Procesado IA",
+                  "value": "Procesado IA"
+                },
+                {
+                  "name": "Esperando aprobación",
+                  "value": "Esperando aprobación"
+                },
+                {
+                  "name": "Aprobado",
+                  "value": "Aprobado"
+                },
+                {
+                  "name": "Rechazado",
+                  "value": "Rechazado"
+                },
+                {
+                  "name": "Enviado al Cliente",
+                  "value": "Enviado al Cliente"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ID_Aprobacion",
+              "displayName": "ID_Aprobacion",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        1024,
+        0
+      ],
+      "id": "e28b31f6-fbf7-435e-8626-4138ad55674c",
+      "name": "Update record",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "kAVqKacbixamdhpE",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0C8DPHA8BS",
+          "mode": "list",
+          "cachedResultName": "nuevo-canal"
+        },
+        "text": "=🚨 *NUEVO LEAD PARA REVISIÓN (HITL)* 🚨  👤 *Cliente:* {{ $('Obtener Lead Nuevo').item.json.fields.Nombre_Cliente }} 📧 *Email:* {{ $('Obtener Lead Nuevo').item.json.fields.Email }} 📊 *Score Comercial IA:* {{ JSON.parse($('Clasificar y Redactar Propuesta').item.json.content.parts[0].text).score }} / 100 💼 *Servicio Cotizado:* {{ $('Obtener Servicio Vinculado').item.json.fields.Nombre_Servicio }} ($USD {{ $('Obtener Servicio Vinculado').item.json.fields.Precio }})  📝 *Propuesta Redactada por la IA:* \"{{ JSON.parse($('Clasificar y Redactar Propuesta').item.json.content.parts[0].text).propuesta }}\"  -------------------------------------------------- 👉 *Acción requerida:* Entrá a Airtable y, si estás de acuerdo, cambiá el estado a *Aprobado* para autorizar el envío del correo al cliente.",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.7,
+      "position": [
+        1264,
+        0
+      ],
+      "id": "72dcd676-3e64-40ec-8b2e-a978af0b61b0",
+      "name": "Notificar Revision a Slack",
+      "webhookId": "9d400d4e-3728-4282-b0e9-b3f745aead0a",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "tKhUFyYsoRFt7f69",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resume": "webhook",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1552,
+        0
+      ],
+      "id": "80c54378-b401-40be-9b93-a6d58d0dbbcf",
+      "name": "Punto de Pausa - HITL",
+      "webhookId": "bd168bac-8c07-4997-9855-3d16ea9694cc"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "f7d9cd97-8f38-4036-9b07-f884c604d121",
+              "leftValue": "={{ $json.fields.Estado }}",
+              "rightValue": "Aprobado",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1936,
+        0
+      ],
+      "id": "45ebbd81-14be-4e7d-af08-04f706920a2c",
+      "name": "Validar Aprobación"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Obtener Lead Nuevo').item.json.fields.Email }}",
+        "subject": "Propuesta Comercial - Solución de Automatización",
+        "emailType": "text",
+        "message": "={{ JSON.parse($('Clasificar y Redactar Propuesta').item.json.content.parts[0].text).propuesta }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        2128,
+        -112
+      ],
+      "id": "c3738f3b-1999-4e5d-a561-d455f180fbd7",
+      "name": "Enviar Propuesta al Cliente",
+      "webhookId": "2676d48f-8fd2-4a44-b106-8faf690ae483",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "5oqk6nhDvucYsMFC",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appIH9rbxzM7sw7zO",
+          "mode": "list",
+          "cachedResultName": "Sistema_Comercial_IA",
+          "cachedResultUrl": "https://airtable.com/appIH9rbxzM7sw7zO"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblbJOI1RGV7EJgGq",
+          "mode": "list",
+          "cachedResultName": "Leads",
+          "cachedResultUrl": "https://airtable.com/appIH9rbxzM7sw7zO/tblbJOI1RGV7EJgGq"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('Obtener Lead Nuevo').item.json.id }}",
+            "Estado": "Enviado al Cliente"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Nombre_Cliente",
+              "displayName": "Nombre_Cliente",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Consulta_Original",
+              "displayName": "Consulta_Original",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Servicio_Interes",
+              "displayName": "Servicio_Interes",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Score_Lead",
+              "displayName": "Score_Lead",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Propuesta_generada",
+              "displayName": "Propuesta_generada",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Estado",
+              "displayName": "Estado",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Nuevo",
+                  "value": "Nuevo"
+                },
+                {
+                  "name": "Procesado IA",
+                  "value": "Procesado IA"
+                },
+                {
+                  "name": "Esperando aprobación",
+                  "value": "Esperando aprobación"
+                },
+                {
+                  "name": "Aprobado",
+                  "value": "Aprobado"
+                },
+                {
+                  "name": "Rechazado",
+                  "value": "Rechazado"
+                },
+                {
+                  "name": "Enviado al Cliente",
+                  "value": "Enviado al Cliente"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ID_Aprobacion",
+              "displayName": "ID_Aprobacion",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        2352,
+        -112
+      ],
+      "id": "47ab349a-941c-4c1b-a580-6d4ff75d4340",
+      "name": "Marcar Lead Enviado",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "kAVqKacbixamdhpE",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "base": {
+          "__rl": true,
+          "value": "appIH9rbxzM7sw7zO",
+          "mode": "list",
+          "cachedResultName": "Sistema_Comercial_IA",
+          "cachedResultUrl": "https://airtable.com/appIH9rbxzM7sw7zO"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblbJOI1RGV7EJgGq",
+          "mode": "list",
+          "cachedResultName": "Leads",
+          "cachedResultUrl": "https://airtable.com/appIH9rbxzM7sw7zO/tblbJOI1RGV7EJgGq"
+        },
+        "id": "={{ $('Obtener Lead Nuevo').item.json.id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        1776,
+        0
+      ],
+      "id": "bca7bb03-4d70-474b-8453-dad1d728fe50",
+      "name": "Consultar Estado Actualizado",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "kAVqKacbixamdhpE",
+          "name": "Airtable account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Obtener Lead Nuevo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener Lead Nuevo": {
+      "main": [
+        [
+          {
+            "node": "Obtener Servicio Vinculado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener Servicio Vinculado": {
+      "main": [
+        [
+          {
+            "node": "Clasificar y Redactar Propuesta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clasificar y Redactar Propuesta": {
+      "main": [
+        [
+          {
+            "node": "Update record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update record": {
+      "main": [
+        [
+          {
+            "node": "Notificar Revision a Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notificar Revision a Slack": {
+      "main": [
+        [
+          {
+            "node": "Punto de Pausa - HITL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Punto de Pausa - HITL": {
+      "main": [
+        [
+          {
+            "node": "Consultar Estado Actualizado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validar Aprobación": {
+      "main": [
+        [
+          {
+            "node": "Enviar Propuesta al Cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar Propuesta al Cliente": {
+      "main": [
+        [
+          {
+            "node": "Marcar Lead Enviado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar Estado Actualizado": {
+      "main": [
+        [
+          {
+            "node": "Validar Aprobación",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "efeaccdf-fd22-4cce-9a00-9e3dc386779a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d12d98283ac83dcea43f902f349a580fa7f21269e1e86adf885d90e3d4a31a7c"
+  },
+  "nodeGroups": [],
+  "id": "HypGW3QxdbPbqWHU",
+  "tags": []
+}
