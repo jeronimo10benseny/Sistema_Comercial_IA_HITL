@@ -10,8 +10,7 @@ Proyecto Final de la materia **IA Automation**. Sistema de extremo a extremo que
 * **Canal de Distribución:** Gmail API
 
 ## 🔗 Enlaces del Proyecto
-* **Base de Datos Airtable (Modo Lectura):** [PEGA_AQUÍ_TU_ENLACE_PÚBLICO_DE_AIRTABLE]
-* **Video Demo (3 minutos):** [PEGA_AQUÍ_TU_ENLACE_A_LOOM_O_YOUTUBE]
+* **Base de Datos Airtable (Modo Lectura):** (https://airtable.com/invite/l?inviteId=inv93ZvjINYuMtUOA&inviteToken=29d661d9340e0410679eca01e5552fdd329975e1d1665079139ff17098001a38&utm_medium=email&utm_source=product_team&utm_content=transactional-alerts)
 
 ## 🛠️ Arquitectura y Flujo de Trabajo
 1. **Ingesta:** Filtrado de registros en Airtable con estado `Nuevo`.
@@ -24,6 +23,6 @@ Proyecto Final de la materia **IA Automation**. Sistema de extremo a extremo que
 8. **Salida Multicanal:** Envío del correo formal vía Gmail y actualización del registro en Airtable a `Enviado al Cliente`.
 
 ## 📁 Estructura del Repositorio
-* `diagrama_arquitectura.pdf`: Memoria técnica detallada y diagramas.
-* `workflow_ecosistema.json`: Archivo exportado del flujo en n8n listo para importar.
+* `Entrega_Final_IA_Automation.pdf`: Memoria técnica detallada y diagramas.
+* `workflow.json`: Archivo exportado del flujo en n8n listo para importar.
 * `/evidencias/`: Capturas de pantalla de la ejecución completa en verde, configuración de nodos, alertas y entrega multicanal.
